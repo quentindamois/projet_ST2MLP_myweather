@@ -1,0 +1,15 @@
+services:
+  backend:
+      build: ../backend
+      ports:
+        - "8001:8000"
+      environment:
+        MODEL_NAME: weather-model
+        ENV_DEV: True
+  frontend:
+      build: ../frontend
+      environment:
+        FLASK_BACKEND_NAME: backend-dev
+      ports:
+       - "8080:80"
+  

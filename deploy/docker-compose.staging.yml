@@ -1,0 +1,17 @@
+services:
+  backend:
+      build: ../backend
+      ports:
+        - "8001:8000"
+      environment:
+        MODEL_NAME: weather-model
+        MODEL_STAGE: Staging
+        MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
+        MLFLOW_TRACKING_TOKEN: ${MLFLOW_TRACKING_TOKEN}
+  frontend:
+      build: ../frontend
+      environment:
+        FLASK_BACKEND_NAME: backend-production
+      ports:
+       - "8080:80"
+  
