@@ -6,9 +6,9 @@ from io import StringIO
 import dvc.api
 import mlflow
 import mlflow.sklearn
-from mlflow.tracking import MlflowClient
 import pandas as pd
 from dotenv import load_dotenv
+from mlflow.tracking import MlflowClient
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsRegressor
