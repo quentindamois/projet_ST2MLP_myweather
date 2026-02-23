@@ -1,14 +1,16 @@
 import os
 from flask import Flask, request, jsonify
 from load_depency import load_model
+from dotenv import load_dotenv
+
 app = Flask(__name__)
 model = load_model()
+load_dotenv()
 
 
 @app.get("/health")
 def health():
     return {"status": "ok", "stage": os.getenv("MODEL_STAGE", "Staging")}
-
 
 
 @app.post("/predict_temperature")
