@@ -30,7 +30,7 @@ export default defineConfig([
     files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
   },
 
-  ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
+  ...pluginOxlint.buildFromOxlintConfigFile('./frontend/.oxlintrc.json'),
 
   skipFormatting,
 ])
