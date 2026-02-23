@@ -20,7 +20,7 @@ def load_model_staging_or_production():
     mlflow.set_tracking_uri(tracking_uri)
     os.environ["MLFLOW_TRACKING_USERNAME"] = token
     os.environ["MLFLOW_TRACKING_PASSWORD"] = token
-    uri = f"models:/{MODEL_NAME}/{MODEL_STAGE}"
+    uri = f"models:/{MODEL_NAME}@{MODEL_STAGE}"
     return mlflow.pyfunc.load_model(uri)
 
 
