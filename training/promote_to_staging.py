@@ -1,7 +1,8 @@
-import os
 import json
+import os
 import sys
-import os, mlflow
+
+import mlflow
 from mlflow.tracking import MlflowClient
 
 MAE_THRESHOLD = float(os.getenv("MAE_THRESHOLD", "25000"))
