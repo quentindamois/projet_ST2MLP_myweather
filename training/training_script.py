@@ -23,6 +23,7 @@ from dotenv import load_dotenv
 ENV_DEV = os.getenv("DEV_ENV", True)
 if ENV_DEV == "False":
     ENV_DEV = False
+    load_dotenv()
 else:
     load_dotenv()
 
@@ -68,6 +69,8 @@ def main():
         mlflow.set_tracking_uri(tracking_uri)
         os.environ["MLFLOW_TRACKING_USERNAME"] = token
         os.environ["MLFLOW_TRACKING_PASSWORD"] = token
+        client = MlflowClient()
+        alias = os.environ["MODEL_ALIAS"]
 
         model, mae = train_model()
 
@@ -89,6 +92,7 @@ def main():
                 "mae": float(mae),
                 "model_version": mv.version,
             }
+            client.set_registered_model_alias(MODEL_NAME, alias, mv.version)
     else:
         model, mae = train_model()
         print(f"Starting the saving of the model")
