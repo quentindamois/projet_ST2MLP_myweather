@@ -38,6 +38,7 @@ def load_model():
         res = load_model_dev()
     else:
         res = load_model_staging_or_production()
+    return res
 
 
 def _build_postgres_uri() -> str:
