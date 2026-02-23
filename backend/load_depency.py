@@ -1,7 +1,8 @@
 import os
+import pickle
+
 import mlflow
 import mlflow.pyfunc
-import pickle
 from dotenv import load_dotenv
 
 ENV_DEV = os.getenv("DEV_ENV", False)
