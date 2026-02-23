@@ -5,7 +5,7 @@ services:
         - "8001:8000"
       environment:
         MODEL_NAME: weather-model
-        ENV_DEV: True
+        DEV_ENV: True
   frontend:
       build: ../frontend
       environment:
