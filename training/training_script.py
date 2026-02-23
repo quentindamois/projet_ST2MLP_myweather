@@ -1,20 +1,19 @@
-import dvc.api
 import os
-from io import StringIO
-import json
+import pickle
 import time
+from io import StringIO
+
+import dvc.api
 import mlflow
 import mlflow.sklearn
+from mlflow.tracking import MlflowClient
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error
-from sklearn.preprocessing import StandardScaler
-import pickle
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OrdinalEncoder
-from sklearn.neighbors import KNeighborsRegressor
 from dotenv import load_dotenv
-
+from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 # test change
 
@@ -48,18 +47,18 @@ def train_model():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
-    print(f"creating the pipeline")
+    print("creating the pipeline")
     pipeline_model = Pipeline(
         [
             ("scaler", StandardScaler()),
             ("knn", KNeighborsRegressor()),
         ]
     )
-    print(f"Training the pipeline")
+    print("Training the pipeline")
     pipeline_model.fit(X_train, y_train)
-    print(f"Training the model")
+    print("Training the model")
     preds = pipeline_model.predict(X_test)
-    print(f"Computing the error of the pipeline")
+    print("Computing the error of the pipeline")
     mae = mean_absolute_error(y_test, preds, multioutput="uniform_average")
     return pipeline_model, mae
 
@@ -90,18 +89,13 @@ def main():
             # Register model
             model_uri = f"runs:/{run.info.run_id}/model"
             mv = mlflow.register_model(model_uri=model_uri, name=MODEL_NAME)
-            out = {
-                "run_id": run.info.run_id,
-                "mae": float(mae),
-                "model_version": mv.version,
-            }
             client.set_registered_model_alias(MODEL_NAME, alias, mv.version)
     else:
         model, mae = train_model()
-        print(f"Starting the saving of the model")
+        print("Starting the saving of the model")
         with open("./backend/dev_model.pkl", "wb") as f:
             pickle.dump(model, f)
-        print(f"the saved model")
+        print("the saved model")
 
 
 if __name__ == "__main__":
