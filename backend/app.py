@@ -1,7 +1,8 @@
 import os
-from flask import Flask, request, jsonify
-from load_depency import load_model
+
 from dotenv import load_dotenv
+from flask import Flask, jsonify, request
+from load_depency import load_model
 
 app = Flask(__name__)
 model = load_model()
