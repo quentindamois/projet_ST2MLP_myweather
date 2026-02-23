@@ -1,59 +1,101 @@
+import dvc.api
 import os
+from io import StringIO
 import json
 import time
 import mlflow
 import mlflow.sklearn
-from sklearn.datasets import make_classification
-from sklearn.linear_model import LogisticRegression
+import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-
+from sklearn.metrics import mean_absolute_error
+from sklearn.preprocessing import StandardScaler
+import pickle
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.neighbors import KNeighborsRegressor
 from dotenv import load_dotenv
+
+# Source - https://stackoverflow.com/a/76764193 for loading the model
+# Posted by davemb83
+# Retrieved 2026-02-22, License - CC BY-SA 4.0
+
+
+ENV_DEV = os.getenv("DEV_ENV", True)
+if ENV_DEV == "False":
+    ENV_DEV = False
+else:
+    load_dotenv()
 
 
 MODEL_NAME = os.getenv("MODEL_NAME", "weather-model")
-DEV_ENV = os.getenv("DEV_ENV", False) # environment value used to determine if we are testing the application localy
-if DEV_ENV == "True":
-    DEV_ENV = True
 
+
+def load_data():
+    """This function load the csv from data folder"""
+    contents = dvc.api.read(path="data/weather_data.csv")
+    df = pd.read_csv(StringIO(contents))
+    X_name_column = ["Humidity_pct", "Wind_Speed_kmh"]
+    y_name_column = "Temperature_C"
+    return df[X_name_column], df[y_name_column]
 
 
 def train_model():
-    X, y = make_classification(n_samples=2000, n_features=10, random_state=42)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    model = LogisticRegression(max_iter=200, l1_ratio=0.9, C=0.9, solver="saga")
-    model.fit(X_train, y_train)
-    preds = model.predict(X_test)
-    acc = accuracy_score(y_test, preds)
-    return model, acc
+    X, y = load_data()
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+    print(f"creating the pipeline")
+    pipeline_model = Pipeline(
+        [
+            ("scaler", StandardScaler()),
+            ("knn", KNeighborsRegressor()),
+        ]
+    )
+    print(f"Training the pipeline")
+    pipeline_model.fit(X_train, y_train)
+    print(f"Training the model")
+    preds = pipeline_model.predict(X_test)
+    print(f"Computing the error of the pipeline")
+    mae = mean_absolute_error(y_test, preds, multioutput="uniform_average")
+    return pipeline_model, mae
+
 
 def main():
 
-    if not(DEV_ENV):
+    if not (ENV_DEV):
         tracking_uri = os.environ["MLFLOW_TRACKING_URI"]
         token = os.environ["MLFLOW_TRACKING_TOKEN"]
         mlflow.set_tracking_uri(tracking_uri)
         os.environ["MLFLOW_TRACKING_USERNAME"] = token
         os.environ["MLFLOW_TRACKING_PASSWORD"] = token
 
-        model, acc = train_model()
+        model, mae = train_model()
 
         run_name = f"candidate-{int(time.time())}"
         with mlflow.start_run(run_name=run_name) as run:
-            mlflow.log_metric("accuracy", float(acc))
+            mlflow.log_metric("mae", float(mae))
             mlflow.log_param("model_type", "logreg")
-            mlflow.log_param("data_version", os.getenv("DATA_VERSION","dvc:unknown"))
+            mlflow.log_param("data_version", os.getenv("DATA_VERSION", "dvc:unknown"))
+            mlflow.log_param(
+                "git commit", os.getenv("GIT_COMMIT_HASH", "commit:unknown")
+            )
+            mlflow.log_params(model.get_params())
             mlflow.sklearn.log_model(model, artifact_path="model")
             # Register model
             model_uri = f"runs:/{run.info.run_id}/model"
             mv = mlflow.register_model(model_uri=model_uri, name=MODEL_NAME)
-            out = {"run_id": run.info.run_id, "accuracy": float(acc), "model_version": mv.version}
-            print(json.dumps(out))
+            out = {
+                "run_id": run.info.run_id,
+                "mae": float(mae),
+                "model_version": mv.version,
+            }
     else:
-        model, acc = train_model()
-        print(f"model accuracy : {acc}")
-        with open('../backend/dev_model.pkl','wb') as f:
+        model, mae = train_model()
+        print(f"Starting the saving of the model")
+        with open("./backend/dev_model.pkl", "wb") as f:
             pickle.dump(model, f)
+        print(f"the saved model")
+
 
 if __name__ == "__main__":
     main()
