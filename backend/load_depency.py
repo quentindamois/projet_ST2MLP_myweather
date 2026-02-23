@@ -2,12 +2,16 @@ import os
 import mlflow
 import mlflow.pyfunc
 import pickle
+from dotenv import load_dotenv
 
-MODEL_NAME = os.getenv("MODEL_NAME", "weather-model")
-MODEL_STAGE = os.getenv("MODEL_STAGE", "Staging")
 ENV_DEV = os.getenv("DEV_ENV", False)
 if ENV_DEV == "True":
     ENV_DEV = True
+    load_dotenv()
+
+MODEL_NAME = os.getenv("MODEL_NAME", "weather-model")
+MODEL_STAGE = os.getenv("MODEL_STAGE", "Staging")
+
 
 def load_model_staging_or_production():
     """Load a model from the dagshub repository"""
@@ -19,17 +23,21 @@ def load_model_staging_or_production():
     uri = f"models:/{MODEL_NAME}/{MODEL_STAGE}"
     return mlflow.pyfunc.load_model(uri)
 
+
 def load_model_dev():
     """load a trained model during training"""
-    with open('dev_model.pkl', 'rb') as f:
+    with open("dev_model.pkl", "rb") as f:
         model = pickle.load(f)
     return model
 
+
 def load_model():
-    if DEV_ENV:
+    print(f"ENV_DEV : {ENV_DEV}")
+    if ENV_DEV:
         res = load_model_dev()
     else:
         res = load_model_staging_or_production()
+
 
 def _build_postgres_uri() -> str:
     db_url = os.environ.get("DATABASE_URL")
