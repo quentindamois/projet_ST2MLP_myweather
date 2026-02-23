@@ -3,7 +3,6 @@
 import { reactive, ref } from 'vue';
 
 const weatherInfo = reactive({
-    Location: '',
     humidityPct: 0.0,
     windSpeed: 0.0
 });
@@ -34,7 +33,7 @@ function askWeather() {
 <template>
 <form @submit.prevent="askWeather">
         <label for="Location">Location</label>
-        <select name="Location" id="Location" v-model="weatherInfo.Location">
+        <select name="Location" id="Location">
             <option value="New York" >New York</option>
             <option value="Los Angeles" >Los Angeles</option>
             <option value="Chicago" >Chicago</option>
