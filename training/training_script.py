@@ -28,7 +28,7 @@ if ENV_DEV == "False":
     load_dotenv()
 else:
     load_dotenv()
-
+print(f"DEV_ENV : {ENV_DEV}")
 
 MODEL_NAME = os.getenv("MODEL_NAME", "weather-model")
 
@@ -90,12 +90,13 @@ def main():
             model_uri = f"runs:/{run.info.run_id}/model"
             mv = mlflow.register_model(model_uri=model_uri, name=MODEL_NAME)
             client.set_registered_model_alias(MODEL_NAME, alias, mv.version)
+            print("model saved on dagshub")
     else:
         model, mae = train_model()
         print("Starting the saving of the model")
         with open("./backend/dev_model.pkl", "wb") as f:
             pickle.dump(model, f)
-        print("the saved model")
+        print("model saved localy")
 
 
 if __name__ == "__main__":
