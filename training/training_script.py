@@ -77,7 +77,7 @@ def main():
         model, mae = train_model()
 
         run_name = f"candidate-{int(time.time())}"
-        with mlflow.start_run(run_name=run_name) as run:
+        with mlflow.start_run(run_name=run_name):
             mlflow.log_metric("mae", float(mae))
             mlflow.log_param("model_type", "logreg")
             mlflow.log_param("data_version", os.getenv("DATA_VERSION", "dvc:unknown"))
@@ -85,11 +85,12 @@ def main():
                 "git commit", os.getenv("GIT_COMMIT_HASH", "commit:unknown")
             )
             mlflow.log_params(model.get_params())
-            mlflow.sklearn.log_model(model, artifact_path="model")
-            # Register model
-            model_uri = f"runs:/{run.info.run_id}/model"
-            mv = mlflow.register_model(model_uri=model_uri, name=MODEL_NAME)
-            client.set_registered_model_alias(MODEL_NAME, alias, mv.version)
+            model_logged_info = mlflow.sklearn.log_model(
+                model, artifact_path="model", registered_model_name=MODEL_NAME
+            )
+            client.set_registered_model_alias(
+                MODEL_NAME, alias, model_logged_info.registered_model_version
+            )
             print("model saved on dagshub")
     else:
         model, mae = train_model()
