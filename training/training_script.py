@@ -15,7 +15,7 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-# test change 2
+# test change 3
 
 # Source - https://stackoverflow.com/a/76764193 for loading the model
 # Posted by davemb83
