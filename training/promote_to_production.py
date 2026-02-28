@@ -26,7 +26,7 @@ def main():
     os.environ["MLFLOW_TRACKING_PASSWORD"] = token
     client = MlflowClient()
     name = os.environ["MODEL_NAME"]
-    alias = os.environ["MODEL_ALIAS"]
+    alias = "Staging"
 
     # we get the info on the history of model
     info_models = client.search_registered_models(filter_string=f"name='{name}'")[0]
@@ -60,8 +60,8 @@ def main():
     if not passed:
         sys.exit(2)
     if passed:
-        client.set_registered_model_alias(name, "Staging", version_of_alias)
-        print(f"Promoted {name} v{version_of_alias} to Staging")
+        client.set_registered_model_alias(name, "Production", version_of_alias)
+        print(f"Promoted {name} v{version_of_alias} to Production")
 
 
 if __name__ == "__main__":
