@@ -1,0 +1,54 @@
+name: Candidate to Staging
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  unit_and_integration_step:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run unit test
+        run: |
+          echo "The unit test should be running"
+      - name: Run Integration test
+          echo "The integration test should be running"
+
+  build_docker_image:
+    needs: unit_and_integration_stepe
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the app
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.DAGSHUB_MLFLOW_TRACKING_URI }}
+          MLFLOW_TRACKING_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          docker compose -f ./deploy/docker-compose.staging.yml build --no-cache
+  
+  promote_to_dev:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      
+      - name: Install ML deps
+        run: |
+          pip install -r ./requirements.txt 
+      - name: give alias dev 
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.DAGSHUB_MLFLOW_TRACKING_URI }}
+          MLFLOW_TRACKING_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          MODEL_NAME: weather-model
+          ALIAS_MODEL: ${{ github.head_ref }}
+          NEW_ALIAS_MODEL: Staging
+        run: |
+          python training/assign_tag.py
+  

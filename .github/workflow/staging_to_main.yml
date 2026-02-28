@@ -1,0 +1,56 @@
+name: Candidate to Staging
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - staging
+
+jobs:
+
+  test_suit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: model attempt passing thorught gate
+        run: |
+          echo "the model would try to pass through gate"
+
+  promote_to_prod:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      
+      - name: Install ML deps
+        run: |
+          pip install -r ./requirements.txt 
+      - name: Evaluate gate 
+        env:
+          ACCURACY_THRESHOLD: "0.80"
+          MLFLOW_TRACKING_URI: ${{ secrets.DAGSHUB_MLFLOW_TRACKING_URI }}
+          MLFLOW_TRACKING_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          MODEL_NAME: weather-model
+        run: |
+          python training/promote_to_production.py
+
+  build_docker_image:
+    needs: unit_and_integration_stepe
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build + push image (staging)
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          MLFLOW_TRACKING_URI: ${{ secrets.DAGSHUB_MLFLOW_TRACKING_URI }}
+          MLFLOW_TRACKING_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+          docker compose -f ./deploy/docker-compose.production.yml build --no-cache
+          docker push "$DOCKERHUB_USERNAME/st2mlp_myweather:backend-production" backend:production
+          docker push "$DOCKERHUB_USERNAME/st2mlp_myweather:frontend-production" frontend:production
