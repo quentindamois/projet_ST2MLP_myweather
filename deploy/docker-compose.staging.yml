@@ -1,5 +1,6 @@
 services:
   backend:
+      image: backend:staging
       build: ../backend
       ports:
         - "8001:8000"
@@ -9,6 +10,7 @@ services:
         MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
         MLFLOW_TRACKING_TOKEN: ${MLFLOW_TRACKING_TOKEN}
   frontend:
+      image: frontend:staging
       build: ../frontend
       environment:
         FLASK_BACKEND_NAME: backend
