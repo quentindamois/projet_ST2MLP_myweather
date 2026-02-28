@@ -11,7 +11,7 @@ if ENV_DEV == "True":
     load_dotenv()
 
 MODEL_NAME = os.getenv("MODEL_NAME", "weather-model")
-MODEL_STAGE = os.getenv("MODEL_STAGE", "Staging")
+MODEL_ALIAS = os.getenv("MODEL_ALIAS", "Staging")
 
 
 def load_model_staging_or_production():
@@ -21,7 +21,7 @@ def load_model_staging_or_production():
     mlflow.set_tracking_uri(tracking_uri)
     os.environ["MLFLOW_TRACKING_USERNAME"] = token
     os.environ["MLFLOW_TRACKING_PASSWORD"] = token
-    uri = f"models:/{MODEL_NAME}@{MODEL_STAGE}"
+    uri = f"models:/{MODEL_NAME}@{MODEL_ALIAS}"
     return mlflow.pyfunc.load_model(uri)
 
 
