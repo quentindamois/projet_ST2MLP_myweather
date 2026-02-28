@@ -66,32 +66,35 @@ def train_model():
 def main():
 
     if not (ENV_DEV):
-        tracking_uri = os.environ["MLFLOW_TRACKING_URI"]
-        token = os.environ["MLFLOW_TRACKING_TOKEN"]
-        mlflow.set_tracking_uri(tracking_uri)
-        os.environ["MLFLOW_TRACKING_USERNAME"] = token
-        os.environ["MLFLOW_TRACKING_PASSWORD"] = token
-        client = MlflowClient()
         alias = os.environ["MODEL_ALIAS"]
+        if not(alias.lower() in set(["dev", "main", "staging"])):
+            tracking_uri = os.environ["MLFLOW_TRACKING_URI"]
+            token = os.environ["MLFLOW_TRACKING_TOKEN"]
+            mlflow.set_tracking_uri(tracking_uri)
+            os.environ["MLFLOW_TRACKING_USERNAME"] = token
+            os.environ["MLFLOW_TRACKING_PASSWORD"] = token
+            client = MlflowClient()
 
-        model, mae = train_model()
+            model, mae = train_model()
 
-        run_name = f"candidate-{int(time.time())}"
-        with mlflow.start_run(run_name=run_name):
-            mlflow.log_metric("mae", float(mae))
-            mlflow.log_param("model_type", "logreg")
-            mlflow.log_param("data_version", os.getenv("DATA_VERSION", "dvc:unknown"))
-            mlflow.log_param(
-                "git commit", os.getenv("GIT_COMMIT_HASH", "commit:unknown")
-            )
-            mlflow.log_params(model.get_params())
-            model_logged_info = mlflow.sklearn.log_model(
-                model, artifact_path="model", registered_model_name=MODEL_NAME
-            )
-            client.set_registered_model_alias(
-                MODEL_NAME, alias, model_logged_info.registered_model_version
-            )
-            print("model saved on dagshub")
+            run_name = f"candidate-{int(time.time())}"
+            with mlflow.start_run(run_name=run_name):
+                mlflow.log_metric("mae", float(mae))
+                mlflow.log_param("model_type", "logreg")
+                mlflow.log_param("data_version", os.getenv("DATA_VERSION", "dvc:unknown"))
+                mlflow.log_param(
+                    "git commit", os.getenv("GIT_COMMIT_HASH", "commit:unknown")
+                )
+                mlflow.log_params(model.get_params())
+                model_logged_info = mlflow.sklearn.log_model(
+                    model, artifact_path="model", registered_model_name=MODEL_NAME
+                )
+                client.set_registered_model_alias(
+                    MODEL_NAME, alias, model_logged_info.registered_model_version
+                )
+                print("model saved on dagshub")
+            else:
+                print("No model created because we are not in a feature devloppement branch")
     else:
         model, mae = train_model()
         print("Starting the saving of the model")
