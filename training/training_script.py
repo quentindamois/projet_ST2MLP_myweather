@@ -67,7 +67,7 @@ def main():
 
     if not (ENV_DEV):
         alias = os.environ["MODEL_ALIAS"]
-        if not(alias.lower() in set(["dev", "main", "staging"])):
+        if alias.lower() not in set(["dev", "main", "staging"]):
             tracking_uri = os.environ["MLFLOW_TRACKING_URI"]
             token = os.environ["MLFLOW_TRACKING_TOKEN"]
             mlflow.set_tracking_uri(tracking_uri)
@@ -81,7 +81,9 @@ def main():
             with mlflow.start_run(run_name=run_name):
                 mlflow.log_metric("mae", float(mae))
                 mlflow.log_param("model_type", "logreg")
-                mlflow.log_param("data_version", os.getenv("DATA_VERSION", "dvc:unknown"))
+                mlflow.log_param(
+                    "data_version", os.getenv("DATA_VERSION", "dvc:unknown")
+                )
                 mlflow.log_param(
                     "git commit", os.getenv("GIT_COMMIT_HASH", "commit:unknown")
                 )
@@ -93,8 +95,10 @@ def main():
                     MODEL_NAME, alias, model_logged_info.registered_model_version
                 )
                 print("model saved on dagshub")
-            else:
-                print("No model created because we are not in a feature devloppement branch")
+        else:
+            print(
+                "No model created because we are not in a feature devloppement branch"
+            )
     else:
         model, mae = train_model()
         print("Starting the saving of the model")
