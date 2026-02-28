@@ -11,7 +11,7 @@ load_dotenv()
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "stage": os.getenv("MODEL_STAGE", "Staging")}
+    return {"status": "ok", "stage": os.getenv("MODEL_ALIAS", "Staging")}
 
 
 @app.post("/predict_temperature")
