@@ -7,8 +7,8 @@ services:
       environment:
         MODEL_NAME: weather-model
         MODEL_ALIAS: Staging
-        MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
-        MLFLOW_TRACKING_TOKEN: ${MLFLOW_TRACKING_TOKEN}
+        MLFLOW_TRACKING_URI: ${DAGSHUB_MLFLOW_TRACKING_URI}
+        MLFLOW_TRACKING_TOKEN: ${DAGSHUB_TOKEN}
   frontend:
       image: frontend:staging
       build: ../frontend
