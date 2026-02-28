@@ -5,7 +5,7 @@ services:
         - "8001:8000"
       environment:
         MODEL_NAME: weather-model
-        MODEL_STAGE: Production
+        MODEL_ALIAS: Production
         MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
         MLFLOW_TRACKING_TOKEN: ${MLFLOW_TRACKING_TOKEN}
   frontend:
