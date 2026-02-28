@@ -22,9 +22,7 @@ def main():
 
     client.set_registered_model_alias(name, "dev", version_of_alias)
 
-    print(
-        f"Add the alias {new_alias} to {alias} of {name} v{version_of_alias}"
-    )
+    print(f"Add the alias {new_alias} to {alias} of {name} v{version_of_alias}")
 
 
 if __name__ == "__main__":
