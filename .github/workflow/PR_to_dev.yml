@@ -1,4 +1,4 @@
-name: Candidate to Staging
+name: Integrating features changes to dev branch
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
           echo "The integration test should be running"
 
   build_docker_image:
-    needs: unit_and_integration_stepe
+    needs: unit_and_integration_step
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
