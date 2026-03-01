@@ -17,9 +17,13 @@ def test_load_data_monkeypatch(tmp_path, monkeypatch):
 
 
 def test_train_model_returns_pipeline(monkeypatch):
-    # patch load_data to use a tiny dataset
-    X = pd.DataFrame({"Humidity_pct": [0, 1, 2], "Wind_Speed_kmh": [1, 2, 3]})
-    y = pd.Series([10, 12, 14])
+    # patch load_data to use a dataset large enough for KNeighborsRegressor(n_neighbors=5)
+    # With 80/20 split, 10 samples -> 8 training + 2 test samples, which is enough for 5 neighbors
+    X = pd.DataFrame({
+        "Humidity_pct": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        "Wind_Speed_kmh": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    })
+    y = pd.Series([10, 12, 14, 16, 18, 20, 22, 24, 26, 28])
     monkeypatch.setattr(ts, "load_data", lambda: (X, y))
     model, mae = ts.train_model()
     # pipeline should have 'knn' step
