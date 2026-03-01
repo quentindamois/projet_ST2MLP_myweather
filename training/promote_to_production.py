@@ -5,7 +5,7 @@ import sys
 import mlflow
 from mlflow.tracking import MlflowClient
 
-MAE_THRESHOLD = float(os.getenv("MAE_THRESHOLD", "25000"))
+MAE_THRESHOLD = int(os.getenv("MAE_THRESHOLD", "25000"))
 
 
 def get_latest_metric(metric_history, name):
