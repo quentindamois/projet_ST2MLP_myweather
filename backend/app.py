@@ -2,9 +2,12 @@ import os
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from load_depency import load_model
 
 app = Flask(__name__)
+# allow cross-origin calls from the front‑end during development/docker
+CORS(app)
 model = load_model()
 load_dotenv()
 

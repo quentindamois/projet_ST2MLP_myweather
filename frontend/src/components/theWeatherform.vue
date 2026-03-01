@@ -7,25 +7,43 @@ const weatherInfo = reactive({
     windSpeed: 0.0
 });
 
-const backend = `http://backend:8001`;
+// browser-side code cannot resolve the Docker service name `backend`;
+// use an environment variable or fall back to localhost port exposed by compose.
+// Vite prefixes environment variables with VITE_ so that they are exposed to the
+// client bundle. See https://vitejs.dev/guide/env-and-mode.html
+const backend = import.meta.env.VITE_BACKEND_URL || "http://localhost:8001";
 async function  askWeatherRequest() {
-const rawResultRequest = await fetch(`${backend}/predict_temperature`, {
-method: "POST",
-headers: { "Content-Type": "application/json" },
-body: JSON.stringify(weatherInfo),
-});
-document.getElementById("predictions").textContent =
-JSON.stringify(await rawResultRequest.json(), null, 2);
+  const rawResultRequest = await fetch(`${backend}/predict_temperature`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    // backend expects { features: [[humidity, wind_speed]] }
+    body: JSON.stringify({
+      features: [[weatherInfo.humidityPct, weatherInfo.windSpeed]],
+    }),
+  });
+  if (!rawResultRequest.ok) {
+    throw new Error(`HTTP ${rawResultRequest.status}`);
+  }
+  const result = await rawResultRequest.json();
+  document.getElementById("predictions").textContent =
+    JSON.stringify(result, null, 2);
+  return result; // return parsed JSON for callers
 };
 
 const sentRequest = ref(false);
 const temperature = ref(0.0)
 
 
-function askWeather() {
-    const res_request = askWeatherRequest();
-    sentRequest.value = true;
-    temperature.value = res_request;
+async function askWeather() {
+    try {
+        const res = await askWeatherRequest();
+        sentRequest.value = true;
+        temperature.value = res ? res.predictions?.[0] : null;
+    } catch (err) {
+        console.error("API error:", err);
+        sentRequest.value = true;
+        temperature.value = `Error: ${err.message}`;
+    }
 }
 </script>
 
@@ -51,6 +69,10 @@ function askWeather() {
         <input id="wind_speed" v-model="weatherInfo.windSpeed" typ="number" step="0.001" min="0.0" inputmode="decimal" />
     <button type="submit">Submit</button>
 </form>
+
+<!-- area where request JSON is dumped -->
+<pre id="predictions" class="mt-2"></pre>
+
 <p  v-if="!sentRequest">
     No value sent
 </p>
