@@ -11,7 +11,7 @@ const weatherInfo = reactive({
 // use an environment variable or fall back to localhost port exposed by compose.
 // Vite prefixes environment variables with VITE_ so that they are exposed to the
 // client bundle. See https://vitejs.dev/guide/env-and-mode.html
-const backend = import.meta.env.VITE_BACKEND_URL || "http://localhost:8001";
+const backend = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 async function  askWeatherRequest() {
   const rawResultRequest = await fetch(`${backend}/predict_temperature`, {
     method: "POST",

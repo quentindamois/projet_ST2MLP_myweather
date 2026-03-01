@@ -1,6 +1,6 @@
 & "$PSScriptRoot\.venv\Scripts\activate.ps1"
-echo "run ruff check"
-ruff check ./training/*.py ./backend/*.py
+echo "run ruff check --fix"
+ruff check ./training/*.py ./backend/*.py --fix
 echo "run ruff format"
 ruff format ./training/*.py ./backend/*.py
 echo "run npx eslint"
