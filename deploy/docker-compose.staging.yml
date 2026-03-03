@@ -11,7 +11,10 @@ services:
         MLFLOW_TRACKING_TOKEN: ${DAGSHUB_TOKEN}
   frontend:
       image: frontend:staging
-      build: ../frontend
+      build:
+        context: ../frontend
+        args:
+          VITE_BACKEND_URL: "http://localhost:8001"
       environment:
         FLASK_BACKEND_NAME: backend
       ports:

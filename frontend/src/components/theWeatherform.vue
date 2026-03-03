@@ -8,12 +8,20 @@ const weatherInfo = reactive({
 });
 
 // browser-side code cannot resolve the Docker service name `backend`;
-// use an environment variable or fall back to localhost port exposed by compose.
-// Vite prefixes environment variables with VITE_ so that they are exposed to the
-// client bundle. See https://vitejs.dev/guide/env-and-mode.html
-const backend = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+// use an environment variable or fall back to the internal service address so
+// that requests work from within a container. Vite prefixes environment
+// variables with VITE_ so that they are exposed to the client bundle. See
+// https://vitejs.dev/guide/env-and-mode.html
+// during local development `npm run dev` the vite dev server proxies
+// '/predict_temperature' to the backend; avoid hardcoding a host so the
+// proxy can work. When the app is built in docker an environment variable
+// is provided which will be used instead.
+const backendEnv = import.meta.env.VITE_BACKEND_URL;
+const backend = backendEnv || "";
 async function  askWeatherRequest() {
-  const rawResultRequest = await fetch(`${backend}/predict_temperature`, {
+  // choose relative path when no backend is configured
+  const url = backend ? `${backend}/predict_temperature` : '/predict_temperature';
+  const rawResultRequest = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     // backend expects { features: [[humidity, wind_speed]] }

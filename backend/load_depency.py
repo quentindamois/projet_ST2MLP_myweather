@@ -27,7 +27,13 @@ def load_model_staging_or_production():
 
 def load_model_dev():
     """load a trained model during training"""
-    with open("dev_model.pkl", "rb") as f:
+    # the training script writes the file into the `backend` package
+    # (project root ./backend/dev_model.pkl). When the repository is copied
+    # into the container it ends up next to this module, so resolve the
+    # path relative to this file so loading works both locally and in Docker.
+    here = os.path.dirname(__file__)
+    path = os.path.join(here, "dev_model.pkl")
+    with open(path, "rb") as f:
         model = pickle.load(f)
     return model
 

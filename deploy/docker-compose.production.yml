@@ -11,7 +11,11 @@ services:
         MLFLOW_TRACKING_TOKEN: ${DAGSHUB_TOKEN}
   frontend:
       image: frontend:production
-      build: ../frontend
+      build:
+        context: ../frontend
+        args:
+          # inside the same docker network the service name works correctly
+          VITE_BACKEND_URL: "http://backend:8000"
       environment:
         FLASK_BACKEND_NAME: backend
       ports:
