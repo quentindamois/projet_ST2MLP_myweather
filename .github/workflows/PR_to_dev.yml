@@ -28,7 +28,7 @@ jobs:
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
-        
+
       - name: Run frontend end-to-end tests
         working-directory: frontend
         run: |
@@ -67,8 +67,8 @@ jobs:
           MLFLOW_TRACKING_URI: ${{ secrets.DAGSHUB_MLFLOW_TRACKING_URI }}
           MLFLOW_TRACKING_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
           MODEL_NAME: weather-model
-          ALIAS_MODEL: ${{ github.head_ref }}
-          NEW_ALIAS_MODEL: dev
+          MODEL_ALIAS: ${{ github.head_ref }}
+          NEW_MODEL_ALIAS: dev
         run: |
           python training/assign_tag.py
   
