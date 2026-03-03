@@ -14,7 +14,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.14'
+          python-version: '3.12'
       - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
@@ -24,13 +24,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
       - name: Run frontend end-to-end tests
         working-directory: frontend
         run: |
+          npm run build
           npx playwright install --with-deps
           npx playwright test
 
@@ -55,7 +56,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.14"
+          python-version: '3.12'
       
       - name: Install ML deps
         run: |
@@ -65,8 +66,8 @@ jobs:
           MLFLOW_TRACKING_URI: ${{ secrets.DAGSHUB_MLFLOW_TRACKING_URI }}
           MLFLOW_TRACKING_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
           MODEL_NAME: weather-model
-          ALIAS_MODEL: ${{ github.head_ref }}
-          NEW_ALIAS_MODEL: dev
+          MODEL_ALIAS: dev
+          NEW_MODEL_ALIAS: dev
         run: |
           python training/assign_tag.py
   
