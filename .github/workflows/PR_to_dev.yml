@@ -67,7 +67,7 @@ jobs:
           MLFLOW_TRACKING_URI: ${{ secrets.DAGSHUB_MLFLOW_TRACKING_URI }}
           MLFLOW_TRACKING_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
           MODEL_NAME: weather-model
-          MODEL_ALIAS: ${{ github.head_ref }}
+          MODEL_ALIAS: dev
           NEW_MODEL_ALIAS: dev
         run: |
           python training/assign_tag.py
