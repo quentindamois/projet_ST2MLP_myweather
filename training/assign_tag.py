@@ -17,9 +17,7 @@ def main():
     new_alias = os.environ["NEW_MODEL_ALIAS"]
 
     # Get registered model
-    info_models = client.search_registered_models(
-        filter_string=f"name='{name}'"
-    )[0]
+    info_models = client.search_registered_models(filter_string=f"name='{name}'")[0]
 
     # If alias exists → use it
     if alias in info_models.aliases:
@@ -29,9 +27,7 @@ def main():
         # Otherwise → take latest version
         latest_versions = client.get_latest_versions(name)
         version = latest_versions[0].version
-        print(
-            f"Alias {alias} does not exist → using latest version {version}"
-        )
+        print(f"Alias {alias} does not exist → using latest version {version}")
 
     # Set new alias
     client.set_registered_model_alias(name, new_alias, version)
