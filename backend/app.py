@@ -2,11 +2,24 @@ import os
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
-from load_depency import load_model
+from flask_cors import CORS
+
+from .load_depency import load_model
 
 app = Flask(__name__)
-model = load_model()
+# allow cross-origin calls from the front‑end during development/docker
+CORS(app)
 load_dotenv()
+
+# Lazy load model on first use
+_model = None
+
+
+def get_model():
+    global _model
+    if _model is None:
+        _model = load_model()
+    return _model
 
 
 @app.get("/health")
@@ -18,6 +31,7 @@ def health():
 def predict():
     payload = request.get_json(force=True)
     X = payload["features"]
+    model = get_model()
     preds = model.predict(X)
     return jsonify({"predictions": preds.tolist()})
 

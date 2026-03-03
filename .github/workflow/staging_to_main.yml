@@ -4,19 +4,39 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - staging
+      - main
 
 jobs:
 
-  test_suit:
+  unit_and_integration_step:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: model attempt passing thorught gate
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - name: Install Python dependencies
         run: |
-          echo "the model would try to pass through gate"
+          pip install -r requirements.txt
+      - name: Run backend unit tests
+        run: |
+          pytest
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Run frontend end-to-end tests
+        working-directory: frontend
+        run: |
+          npx playwright install --with-deps
+          npx playwright test
 
   promote_to_prod:
+    needs: unit_and_integration_step
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +59,7 @@ jobs:
           python training/promote_to_production.py
 
   build_docker_image:
-    needs: unit_and_integration_stepe
+    needs: promote_to_prod
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

@@ -15,4 +15,16 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  // during front‑end development (vite dev server) proxy API calls to the
+  // backend on localhost:8001. this makes `fetch('/predict_temperature')`
+  // work without hardcoding the host.
+  server: {
+    proxy: {
+      '/predict_temperature': {
+        target: 'http://localhost:8001',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 })

@@ -9,9 +9,17 @@ services:
         DEV_ENV: True
   frontend:
       image: frontend:dev
-      build: ../frontend
+      build:
+        context: ../frontend
+        args:
+          # when running the stack for local development the browser on the
+          # host must be able to reach the backend. Use the host-mapped port so
+          # the baked assets call the correct address from the browser.
+          VITE_BACKEND_URL: "http://localhost:8001"
       environment:
         FLASK_BACKEND_NAME: backend-dev
+        # this value is baked into the static build; browsers will use it
+        VITE_BACKEND_URL: "http://localhost:8001"
       ports:
        - "8080:80"
   

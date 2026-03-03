@@ -9,6 +9,13 @@ RUN npm install -g http-server
 # make the 'app' folder the current working directory
 WORKDIR /frontend
 
+# allow build-time override of the backend URL so Vite can bake it into
+# the compiled assets (`import.meta.env.VITE_BACKEND_URL`).  Default to the
+# internal service name so that even if the build arg is omitted the frontend
+# will target the backend container on the shared network.
+ARG VITE_BACKEND_URL="http://backend:8000"
+ENV VITE_BACKEND_URL=${VITE_BACKEND_URL}
+
 # copy both 'package.json' and 'package-lock.json' (if available)
 COPY package*.json ./
 
