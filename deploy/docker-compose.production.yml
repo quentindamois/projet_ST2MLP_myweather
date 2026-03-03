@@ -15,7 +15,7 @@ services:
         context: ../frontend
         args:
           # inside the same docker network the service name works correctly
-          VITE_BACKEND_URL: "http://backend:8000"
+          VITE_BACKEND_URL: "http://st2mlpmyweather-backend:8000"
       environment:
         FLASK_BACKEND_NAME: backend
       ports:
