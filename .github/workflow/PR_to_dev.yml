@@ -11,11 +11,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run unit test
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - name: Install Python dependencies
         run: |
-          echo "The unit test should be running"
-      - name: Run Integration test
-          echo "The integration test should be running"
+          pip install -r requirements.txt
+      - name: Run backend unit tests
+        run: |
+          pytest
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Run frontend end-to-end tests
+        working-directory: frontend
+        run: |
+          npx playwright install --with-deps
+          npx playwright test
 
   build_docker_image:
     needs: unit_and_integration_step
@@ -30,6 +47,7 @@ jobs:
           docker compose -f ./deploy/docker-compose.staging.yml build --no-cache
   
   promote_to_dev:
+    needs: build_docker_image
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
