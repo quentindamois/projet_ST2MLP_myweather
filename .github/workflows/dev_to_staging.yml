@@ -34,7 +34,7 @@ jobs:
           npm run build
           npx playwright install --with-deps
           npx playwright test
-          
+
   build_docker_image:
     needs: unit_and_integration_step
     runs-on: ubuntu-latest
@@ -49,8 +49,10 @@ jobs:
         run: |
           echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
           docker compose -f ./deploy/docker-compose.staging.yml build --no-cache
-          docker push "${DOCKERHUB_USERNAME}/st2mlp_myweather:backend-staging" backend:staging
-          docker push "${DOCKERHUB_USERNAME}/st2mlp_myweather:frontend-staging" frontend:staging
+          docker tag backend:staging ${DOCKERHUB_USERNAME}/st2mlp_myweather-backend:staging
+          docker tag frontend:staging ${DOCKERHUB_USERNAME}/st2mlp_myweather-frontend:staging
+          docker push ${DOCKERHUB_USERNAME}/st2mlp_myweather-backend:staging
+          docker push ${DOCKERHUB_USERNAME}/st2mlp_myweather-frontend:staging
   promote_to_staging:
     needs: build_docker_image
     runs-on: ubuntu-latest
