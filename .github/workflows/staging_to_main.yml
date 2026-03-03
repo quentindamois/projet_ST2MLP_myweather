@@ -73,5 +73,7 @@ jobs:
         run: |
           echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
           docker compose -f ./deploy/docker-compose.production.yml build --no-cache
-          docker push "$DOCKERHUB_USERNAME/st2mlp_myweather-backend:production"
-          docker push "$DOCKERHUB_USERNAME/st2mlp_myweather-frontend:production"
+          docker tag backend:production ${DOCKERHUB_USERNAME}/st2mlp_myweather-backend:production
+          docker tag frontend:production ${DOCKERHUB_USERNAME}/st2mlp_myweather-frontend:production
+          docker push ${DOCKERHUB_USERNAME}/st2mlp_myweather-backend:production
+          docker push ${DOCKERHUB_USERNAME}/st2mlp_myweather-frontend:production
