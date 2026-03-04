@@ -52,3 +52,8 @@ Web application that serves a weather prediction model with a Vue.js frontend an
 5. Start the application:
    - Locally with Docker Compose using the staging or production configuration, **or**
    - By opening pull requests to trigger the automated pipelines.
+  
+## Using the solution
+
+The solution is hosted on Railway at https://st2mlpmyweather-frontend-production.up.railway.app
+
