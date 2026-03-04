@@ -26,7 +26,7 @@ Web application that serves a weather prediction model with a Vue.js frontend an
   - Build and push staging images (backend and frontend) to the container registry.
 
 - **Pull request → `main` branch**  
-  - Evaluate the candidate model with a quality gate - Mean absolute error of at least 25000.  
+  - Evaluate the candidate model with a quality gate - Mean absolute error of less than 25000.  
   - If it passes, promote the model to production.  
   - Build and push production images.
 
