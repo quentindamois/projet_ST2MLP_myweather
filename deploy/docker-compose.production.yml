@@ -1,16 +1,14 @@
 services:
   backend:
       image: backend:production
-      build: 
-        context: ../backend
-        args:
-          MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
-          MLFLOW_TRACKING_TOKEN: ${MLFLOW_TRACKING_TOKEN}
+      build: ../backend
       ports:
         - "8001:8000"
       environment:
         MODEL_NAME: weather-model
         MODEL_ALIAS: Production
+        MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
+        MLFLOW_TRACKING_TOKEN: ${MLFLOW_TRACKING_TOKEN}
   frontend:
       image: frontend:production
       build:
