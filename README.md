@@ -12,7 +12,7 @@ Web application that serves a weather prediction model with a Vue.js frontend an
   - `pre-push`: train the model and log it to DagsHub.
 - Containers are built and deployed to staging and production environments on the cloud.
 
-_Insert here: `![Architecture](architecture.png)`_
+![Architecture](architecture.png)
 
 ## CI/CD Explanation
 
