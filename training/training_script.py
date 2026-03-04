@@ -51,7 +51,7 @@ def train_model():
     pipeline_model = Pipeline(
         [
             ("scaler", StandardScaler()),
-            ("knn", KNeighborsRegressor()),
+            ("knn", KNeighborsRegressor(n_neighbors=7)),
         ]
     )
     print("Training the pipeline")
